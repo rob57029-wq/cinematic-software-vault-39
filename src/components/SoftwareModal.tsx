@@ -5,6 +5,7 @@ import { cn } from '@/lib/utils';
 import { Download } from 'lucide-react';
 import { useConfig } from '@/contexts/ConfigContext';
 import { useLanguage } from "@/contexts/LanguageContext";
+import { supabase } from "@/integrations/supabase/client";
 import { 
   Image, Music, Video, Palette, BarChart3, Box, Edit,
   FileText, Layers, Bot, Shield, Scissors, Film, Stamp, PenTool,
@@ -96,6 +97,18 @@ const SoftwareModal: React.FC<SoftwareModalProps> = ({ software, isOpen, onClose
       setCopySuccess(false);
     }, 2000);
   };
+
+  const trackDownload = async (softwareName: string) => {
+    try {
+      await supabase.from('downloads').insert({
+        software_name: softwareName,
+        user_ip: '', // Can be set server-side for privacy
+        user_agent: navigator.userAgent
+      });
+    } catch (error) {
+      console.error('Error tracking download:', error);
+    }
+  };
   
   if (!software) return null;
   
@@ -162,7 +175,11 @@ const SoftwareModal: React.FC<SoftwareModalProps> = ({ software, isOpen, onClose
           
           <div className="bg-muted/30 rounded-lg p-6 mb-8 flex flex-col md:flex-row gap-6">
             <div className="flex-1">
-              <a href={config.download_url} className="neumorphic-button w-full py-3 px-6 text-center text-blue-400 hover:text-blue-300 font-medium mb-4 flex items-center justify-center gap-2">
+              <a 
+                href={config.download_url} 
+                className="neumorphic-button w-full py-3 px-6 text-center text-blue-400 hover:text-blue-300 font-medium mb-4 flex items-center justify-center gap-2"
+                onClick={() => trackDownload(software.name)}
+              >
                 <Download className="w-4 h-4" />
                 {t("downloadNow")}
               </a>
