@@ -5,7 +5,9 @@ import {
   Image, Download, Music, Video, Palette, BarChart3, Box, Edit,
   FileText, Layers, Bot, Shield, Scissors, Film, Stamp, PenTool,
   PaintBucket, Camera, Film as FilmIcon, Music as MusicIcon,
-  Brush, FileType, LucideIcon, Layers3, Wallpaper
+  Brush, FileType, LucideIcon, Layers3, Wallpaper, Figma, Folder,
+  Play, Cpu, Hammer, Palette as PaletteIcon, Code, FileImage,
+  Settings, BookOpen, Zap, Database, Archive
 } from 'lucide-react';
 
 export interface SoftwareItem {
@@ -57,6 +59,20 @@ const SoftwareCard: React.FC<SoftwareCardProps> = ({ software, onClick, classNam
     if (name.includes('indesign')) return FileType;
     if (name.includes('animate')) return Layers3;
     if (name.includes('wallpaper')) return Wallpaper;
+    if (name.includes('xd')) return Figma;
+    if (name.includes('bridge')) return Folder;
+    if (name.includes('videostudio')) return Play;
+    if (name.includes('vegas')) return Video;
+    if (name.includes('serato')) return Music;
+    if (name.includes('captivate')) return Code;
+    if (name.includes('pinnacle')) return Edit;
+    if (name.includes('solidworks')) return Cpu;
+    if (name.includes('zbrush')) return Hammer;
+    if (name.includes('uniconverter')) return Video;
+    if (name.includes('robohelp')) return BookOpen;
+    if (name.includes('avs')) return Edit;
+    if (name.includes('nitro')) return FileText;
+    if (name.includes('systemcare')) return Settings;
     
     // Default icon for any other software
     return Box;

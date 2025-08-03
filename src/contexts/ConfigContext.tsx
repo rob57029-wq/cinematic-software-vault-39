@@ -8,7 +8,7 @@ interface Config {
 }
 
 const defaultConfig: Config = {
-  site_name: "PrimeSoft",
+  site_name: "Creations.Tools",
   download_url: "#",
   archive_password: "password"
 };
