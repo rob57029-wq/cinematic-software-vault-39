@@ -14,13 +14,42 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      downloads: {
+        Row: {
+          downloaded_at: string
+          id: string
+          software_name: string
+          user_agent: string | null
+          user_ip: string | null
+        }
+        Insert: {
+          downloaded_at?: string
+          id?: string
+          software_name: string
+          user_agent?: string | null
+          user_ip?: string | null
+        }
+        Update: {
+          downloaded_at?: string
+          id?: string
+          software_name?: string
+          user_agent?: string | null
+          user_ip?: string | null
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_download_stats: {
+        Args: { period_hours?: number }
+        Returns: {
+          software_name: string
+          download_count: number
+        }[]
+      }
     }
     Enums: {
       [_ in never]: never
