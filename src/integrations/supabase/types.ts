@@ -16,6 +16,7 @@ export type Database = {
     Tables: {
       downloads: {
         Row: {
+          country: string | null
           downloaded_at: string
           id: string
           software_name: string
@@ -23,6 +24,7 @@ export type Database = {
           user_ip: string | null
         }
         Insert: {
+          country?: string | null
           downloaded_at?: string
           id?: string
           software_name: string
@@ -30,6 +32,7 @@ export type Database = {
           user_ip?: string | null
         }
         Update: {
+          country?: string | null
           downloaded_at?: string
           id?: string
           software_name?: string
@@ -48,6 +51,30 @@ export type Database = {
         Returns: {
           software_name: string
           download_count: number
+        }[]
+      }
+      get_download_stats_by_country: {
+        Args: { period_hours?: number; software_names?: string[] }
+        Returns: {
+          country: string
+          download_count: number
+        }[]
+      }
+      get_download_stats_over_time: {
+        Args: {
+          period_type?: string
+          period_count?: number
+          software_names?: string[]
+        }
+        Returns: {
+          period_label: string
+          download_count: number
+        }[]
+      }
+      get_software_names: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          software_name: string
         }[]
       }
     }

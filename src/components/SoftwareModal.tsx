@@ -100,10 +100,21 @@ const SoftwareModal: React.FC<SoftwareModalProps> = ({ software, isOpen, onClose
 
   const trackDownload = async (softwareName: string) => {
     try {
+      // Get user's country from IP
+      let country = 'Unknown';
+      try {
+        const geoResponse = await fetch('https://ipapi.co/json/');
+        const geoData = await geoResponse.json();
+        country = geoData.country_name || 'Unknown';
+      } catch (geoError) {
+        console.log('Could not get geolocation:', geoError);
+      }
+
       await supabase.from('downloads').insert({
         software_name: softwareName,
         user_ip: '', // Can be set server-side for privacy
-        user_agent: navigator.userAgent
+        user_agent: navigator.userAgent,
+        country: country
       });
     } catch (error) {
       console.error('Error tracking download:', error);
