@@ -8,6 +8,7 @@ import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
 import { supabase } from "@/integrations/supabase/client";
 import { useConfig } from "@/contexts/ConfigContext";
+import { formatInTimeZone } from "date-fns-tz";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -48,6 +49,8 @@ const Stats = () => {
   const [selectedPeriod, setSelectedPeriod] = useState<'hour' | 'day' | 'week'>('day');
   const [liveLogs, setLiveLogs] = useState<LiveLogEntry[]>([]);
   const [loading, setLoading] = useState(true);
+  const [onlineUsers, setOnlineUsers] = useState(0);
+  const [userTimezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone);
 
   const fetchSoftwareNames = async () => {
     try {
@@ -79,7 +82,17 @@ const Stats = () => {
         software_names: selectedSoftware.length > 0 ? selectedSoftware : null
       });
 
-      setTimelineData(timeline || []);
+      // Convert timeline data to user's timezone
+      const timelineWithTimezone = timeline?.map(item => ({
+        ...item,
+        period_label: selectedPeriod === 'hour' 
+          ? formatInTimeZone(new Date(item.period_label.replace(':00', ':00:00')), userTimezone, 'yyyy-MM-dd HH:mm')
+          : selectedPeriod === 'day'
+          ? formatInTimeZone(new Date(item.period_label), userTimezone, 'yyyy-MM-dd')
+          : item.period_label
+      })) || [];
+
+      setTimelineData(timelineWithTimezone);
 
       // Fetch country data
       const { data: countries } = await supabase.rpc('get_download_stats_by_country', {
@@ -120,8 +133,8 @@ const Stats = () => {
       fetchRecentLogs();
     }, 30000);
 
-    // Set up real-time subscription
-    const channel = supabase
+    // Set up real-time subscription for downloads
+    const downloadChannel = supabase
       .channel('schema-db-changes')
       .on(
         'postgres_changes',
@@ -139,9 +152,31 @@ const Stats = () => {
       )
       .subscribe();
 
+    // Set up presence tracking for online users
+    const presenceChannel = supabase.channel('online-users')
+      .on('presence', { event: 'sync' }, () => {
+        const state = presenceChannel.presenceState();
+        setOnlineUsers(Object.keys(state).length);
+      })
+      .on('presence', { event: 'join' }, ({ key, newPresences }) => {
+        setOnlineUsers(prev => prev + newPresences.length);
+      })
+      .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
+        setOnlineUsers(prev => Math.max(0, prev - leftPresences.length));
+      })
+      .subscribe(async (status) => {
+        if (status === 'SUBSCRIBED') {
+          await presenceChannel.track({
+            user_id: Math.random().toString(36).substring(7),
+            online_at: new Date().toISOString(),
+          });
+        }
+      });
+
     return () => {
       clearInterval(interval);
-      supabase.removeChannel(channel);
+      supabase.removeChannel(downloadChannel);
+      supabase.removeChannel(presenceChannel);
     };
   }, [selectedSoftware, selectedPeriod]);
 
@@ -326,7 +361,7 @@ const Stats = () => {
               <div className="bg-black rounded-lg p-4 h-64 overflow-y-auto font-mono text-sm">
                 {liveLogs.slice(0, 50).map((log) => (
                   <div key={log.id} className="text-green-400 mb-1">
-                    [{new Date(log.downloaded_at).toLocaleString()}] {log.software_name}:{log.country || 'Unknown'}:{log.user_ip || 'Hidden'}
+                    [{formatInTimeZone(new Date(log.downloaded_at), userTimezone, 'yyyy-MM-dd HH:mm:ss')}] {log.software_name}:{log.country || 'Unknown'}:{log.user_ip || 'Hidden'}
                   </div>
                 ))}
                 {liveLogs.length === 0 && (
@@ -357,7 +392,18 @@ const Stats = () => {
           </TabsContent>
         </Tabs>
 
-        <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="mt-8 grid grid-cols-1 md:grid-cols-4 gap-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-sm">Пользователей онлайн</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="text-3xl font-bold text-green-500">
+                {onlineUsers}
+              </div>
+            </CardContent>
+          </Card>
+
           <Card>
             <CardHeader>
               <CardTitle className="text-sm">Всего за час</CardTitle>
