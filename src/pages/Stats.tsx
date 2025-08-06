@@ -9,11 +9,6 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, Respon
 import { supabase } from "@/integrations/supabase/client";
 import { useConfig } from "@/contexts/ConfigContext";
 import { formatInTimeZone } from "date-fns-tz";
-import { startOfDay, endOfDay, startOfWeek, endOfWeek, subDays, subWeeks, format } from "date-fns";
-import type { DateRange } from "react-day-picker";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -56,8 +51,6 @@ const Stats = () => {
   const [loading, setLoading] = useState(true);
   const [onlineUsers, setOnlineUsers] = useState(0);
   const [userTimezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone);
-  const [customDateRange, setCustomDateRange] = useState<DateRange | undefined>(undefined);
-  const [quickFilter, setQuickFilter] = useState<string>('day');
 
   const fetchSoftwareNames = async () => {
     try {
@@ -81,46 +74,20 @@ const Stats = () => {
       setDailyStats(daily || []);
       setWeeklyStats(weekly || []);
 
-      // Calculate timeline parameters based on quick filter or custom dates
-      let timelineParams = { period_type: selectedPeriod, period_count: 7, software_names: selectedSoftware.length > 0 ? selectedSoftware : null };
-      
-      if (customDateRange?.from && customDateRange?.to) {
-        // Use custom date range
-        const diffInDays = Math.ceil((customDateRange.to.getTime() - customDateRange.from.getTime()) / (1000 * 60 * 60 * 24));
-        timelineParams.period_count = Math.max(1, diffInDays);
-      } else {
-        // Use quick filter
-        const now = new Date();
-        switch (quickFilter) {
-          case 'hour':
-            timelineParams = { period_type: 'hour', period_count: 1, software_names: selectedSoftware.length > 0 ? selectedSoftware : null };
-            break;
-          case 'today':
-            timelineParams = { period_type: 'hour', period_count: 24, software_names: selectedSoftware.length > 0 ? selectedSoftware : null };
-            break;
-          case 'yesterday':
-            timelineParams = { period_type: 'hour', period_count: 24, software_names: selectedSoftware.length > 0 ? selectedSoftware : null };
-            break;
-          case 'thisWeek':
-            timelineParams = { period_type: 'day', period_count: 7, software_names: selectedSoftware.length > 0 ? selectedSoftware : null };
-            break;
-          case 'lastWeek':
-            timelineParams = { period_type: 'day', period_count: 7, software_names: selectedSoftware.length > 0 ? selectedSoftware : null };
-            break;
-          default:
-            timelineParams = { period_type: selectedPeriod, period_count: 7, software_names: selectedSoftware.length > 0 ? selectedSoftware : null };
-        }
-      }
-
       // Fetch timeline data
-      const { data: timeline } = await supabase.rpc('get_download_stats_over_time', timelineParams);
+      const periodMap = { hour: 24, day: 7, week: 4 };
+      const { data: timeline } = await supabase.rpc('get_download_stats_over_time', {
+        period_type: selectedPeriod,
+        period_count: periodMap[selectedPeriod],
+        software_names: selectedSoftware.length > 0 ? selectedSoftware : null
+      });
 
       // Convert timeline data to user's timezone
       const timelineWithTimezone = timeline?.map(item => ({
         ...item,
-        period_label: timelineParams.period_type === 'hour' 
+        period_label: selectedPeriod === 'hour' 
           ? formatInTimeZone(new Date(item.period_label.replace(':00', ':00:00')), userTimezone, 'yyyy-MM-dd HH:mm')
-          : timelineParams.period_type === 'day'
+          : selectedPeriod === 'day'
           ? formatInTimeZone(new Date(item.period_label), userTimezone, 'yyyy-MM-dd')
           : item.period_label
       })) || [];
@@ -211,11 +178,11 @@ const Stats = () => {
       supabase.removeChannel(downloadChannel);
       supabase.removeChannel(presenceChannel);
     };
-  }, [selectedSoftware, selectedPeriod, quickFilter, customDateRange]);
+  }, [selectedSoftware, selectedPeriod]);
 
   useEffect(() => {
     fetchStats();
-  }, [selectedSoftware, selectedPeriod, quickFilter, customDateRange]);
+  }, [selectedSoftware, selectedPeriod]);
 
   const renderStatsTable = (stats: DownloadStat[], period: string) => (
     <Card>
@@ -325,123 +292,6 @@ const Stats = () => {
                       <SelectItem value="week">По неделям</SelectItem>
                     </SelectContent>
                   </Select>
-                </div>
-              </div>
-              
-              {/* Quick filters */}
-              <div className="mt-4">
-                <label className="text-sm font-medium mb-2 block">Быстрые фильтры</label>
-                <div className="flex flex-wrap gap-2 mb-4">
-                  <button
-                    onClick={() => {
-                      setQuickFilter('hour');
-                      setCustomDateRange(undefined);
-                    }}
-                    className={`px-3 py-1 text-sm rounded-lg border transition-colors ${
-                      quickFilter === 'hour' && !customDateRange?.from 
-                        ? 'bg-primary text-primary-foreground border-primary' 
-                        : 'bg-background hover:bg-muted border-border'
-                    }`}
-                  >
-                    Последний час
-                  </button>
-                  <button
-                    onClick={() => {
-                      setQuickFilter('today');
-                      setCustomDateRange(undefined);
-                    }}
-                    className={`px-3 py-1 text-sm rounded-lg border transition-colors ${
-                      quickFilter === 'today' && !customDateRange?.from 
-                        ? 'bg-primary text-primary-foreground border-primary' 
-                        : 'bg-background hover:bg-muted border-border'
-                    }`}
-                  >
-                    Сегодня
-                  </button>
-                  <button
-                    onClick={() => {
-                      setQuickFilter('yesterday');
-                      setCustomDateRange(undefined);
-                    }}
-                    className={`px-3 py-1 text-sm rounded-lg border transition-colors ${
-                      quickFilter === 'yesterday' && !customDateRange?.from 
-                        ? 'bg-primary text-primary-foreground border-primary' 
-                        : 'bg-background hover:bg-muted border-border'
-                    }`}
-                  >
-                    Вчера
-                  </button>
-                  <button
-                    onClick={() => {
-                      setQuickFilter('thisWeek');
-                      setCustomDateRange(undefined);
-                    }}
-                    className={`px-3 py-1 text-sm rounded-lg border transition-colors ${
-                      quickFilter === 'thisWeek' && !customDateRange?.from 
-                        ? 'bg-primary text-primary-foreground border-primary' 
-                        : 'bg-background hover:bg-muted border-border'
-                    }`}
-                  >
-                    Эта неделя
-                  </button>
-                  <button
-                    onClick={() => {
-                      setQuickFilter('lastWeek');
-                      setCustomDateRange(undefined);
-                    }}
-                    className={`px-3 py-1 text-sm rounded-lg border transition-colors ${
-                      quickFilter === 'lastWeek' && !customDateRange?.from 
-                        ? 'bg-primary text-primary-foreground border-primary' 
-                        : 'bg-background hover:bg-muted border-border'
-                    }`}
-                  >
-                    Прошлая неделя
-                  </button>
-                </div>
-                
-                {/* Custom date range */}
-                <div className="flex items-center gap-2">
-                  <span className="text-sm">Или выберите даты:</span>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <button className={`px-3 py-1 text-sm rounded-lg border transition-colors flex items-center gap-2 ${
-                        customDateRange?.from 
-                          ? 'bg-primary text-primary-foreground border-primary' 
-                          : 'bg-background hover:bg-muted border-border'
-                      }`}>
-                        <CalendarIcon className="h-4 w-4" />
-                        {customDateRange?.from && customDateRange?.to 
-                          ? `${format(customDateRange.from, 'dd.MM.yyyy')} - ${format(customDateRange.to, 'dd.MM.yyyy')}`
-                          : customDateRange?.from 
-                          ? format(customDateRange.from, 'dd.MM.yyyy')
-                          : 'Выбрать период'
-                        }
-                      </button>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar
-                        mode="range"
-                        selected={customDateRange}
-                        onSelect={(range) => {
-                          setCustomDateRange(range);
-                          setQuickFilter('');
-                        }}
-                        numberOfMonths={2}
-                        className="p-3 pointer-events-auto"
-                      />
-                    </PopoverContent>
-                  </Popover>
-                  {customDateRange?.from && (
-                    <button
-                      onClick={() => {
-                        setCustomDateRange(undefined);
-                        setQuickFilter('day');
-                      }}
-                      className="px-2 py-1 text-xs bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-                    >
-                      Сбросить
-                    </button>
-                  )}
                 </div>
               </div>
             </CardContent>
