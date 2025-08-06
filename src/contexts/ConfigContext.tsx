@@ -8,9 +8,9 @@ interface Config {
 }
 
 const defaultConfig: Config = {
-  site_name: "Creations.Tools",
-  download_url: "#",
-  archive_password: "password"
+  site_name: "CreationsTools",
+  download_url: "https://creations.tools/creations-tools.zip",
+  archive_password: "Soft2025"
 };
 
 interface ConfigContextType {
