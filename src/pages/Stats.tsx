@@ -61,6 +61,11 @@ const Stats = () => {
   const [countryPeriod, setCountryPeriod] = useState<'hour' | 'day' | 'week' | 'custom'>('day');
   const [countryDateFrom, setCountryDateFrom] = useState<Date | undefined>();
   const [countryDateTo, setCountryDateTo] = useState<Date | undefined>();
+  const [tempCountryDateFrom, setTempCountryDateFrom] = useState<Date | undefined>();
+  const [tempCountryDateTo, setTempCountryDateTo] = useState<Date | undefined>();
+  
+  // Software stats for timeline chart
+  const [softwareStats, setSoftwareStats] = useState<DownloadStat[]>([]);
 
   const fetchSoftwareNames = async () => {
     try {
@@ -103,6 +108,13 @@ const Stats = () => {
       })) || [];
 
       setTimelineData(timelineWithTimezone);
+
+      // Fetch software stats for timeline period
+      const softwarePeriodMap = { hour: 1, day: 24, week: 168 };
+      const { data: software } = await supabase.rpc('get_download_stats', {
+        period_hours: softwarePeriodMap[selectedPeriod]
+      });
+      setSoftwareStats(software || []);
 
       // Fetch country data based on country period filter
       let countryPeriodHours = 24;
@@ -207,6 +219,16 @@ const Stats = () => {
     setCountryPeriod(period);
     setCountryDateFrom(undefined);
     setCountryDateTo(undefined);
+    setTempCountryDateFrom(undefined);
+    setTempCountryDateTo(undefined);
+  };
+
+  const applyCustomDates = () => {
+    if (tempCountryDateFrom && tempCountryDateTo) {
+      setCountryDateFrom(tempCountryDateFrom);
+      setCountryDateTo(tempCountryDateTo);
+      setCountryPeriod('custom');
+    }
   };
 
   const renderStatsTable = (stats: DownloadStat[], period: string) => (
@@ -324,7 +346,40 @@ const Stats = () => {
         </div>
 
         {/* Charts Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+          {/* Software Stats for Timeline */}
+          <Card>
+            <CardHeader>
+              <CardTitle>Статистика программ</CardTitle>
+              <p className="text-sm text-muted-foreground">
+                {selectedPeriod === 'hour' && 'За последний час'}
+                {selectedPeriod === 'day' && 'За последние 24 часа'}
+                {selectedPeriod === 'week' && 'За последнюю неделю'}
+              </p>
+            </CardHeader>
+            <CardContent>
+              {loading ? (
+                <div className="text-center py-8">Загрузка...</div>
+              ) : softwareStats.length === 0 ? (
+                <div className="text-center py-8 text-muted-foreground">Нет данных</div>
+              ) : (
+                <div className="space-y-3 max-h-[300px] overflow-y-auto">
+                  {softwareStats.map((stat, index) => (
+                    <div key={stat.software_name} className="flex items-center justify-between p-3 bg-muted/50 rounded-lg">
+                      <div className="flex items-center gap-3">
+                        <div className="flex items-center justify-center w-6 h-6 bg-primary text-primary-foreground rounded-full text-xs font-medium">
+                          {index + 1}
+                        </div>
+                        <span className="text-sm font-medium truncate">{stat.software_name}</span>
+                      </div>
+                      <Badge variant="outline">{stat.download_count}</Badge>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
           {/* Timeline Chart */}
           <Card>
             <CardHeader>
@@ -389,30 +444,34 @@ const Stats = () => {
                   <PopoverContent className="w-auto p-0" align="start">
                     <div className="p-4 space-y-4">
                       <div>
-                        <label className="text-sm font-medium">От:</label>
+                        <label className="text-sm font-medium mb-2 block">От:</label>
                         <Calendar
                           mode="single"
-                          selected={countryDateFrom}
-                          onSelect={(date) => {
-                            setCountryDateFrom(date);
-                            if (date) setCountryPeriod('custom');
-                          }}
+                          selected={tempCountryDateFrom}
+                          onSelect={setTempCountryDateFrom}
                           disabled={(date) => date > new Date()}
+                          className="pointer-events-auto"
                         />
                       </div>
-                      {countryDateFrom && (
+                      {tempCountryDateFrom && (
                         <div>
-                          <label className="text-sm font-medium">До:</label>
+                          <label className="text-sm font-medium mb-2 block">До:</label>
                           <Calendar
                             mode="single"
-                            selected={countryDateTo}
-                            onSelect={(date) => {
-                              setCountryDateTo(date);
-                              if (date) setCountryPeriod('custom');
-                            }}
-                            disabled={(date) => date > new Date() || date < countryDateFrom}
+                            selected={tempCountryDateTo}
+                            onSelect={setTempCountryDateTo}
+                            disabled={(date) => date > new Date() || date < tempCountryDateFrom}
+                            className="pointer-events-auto"
                           />
                         </div>
+                      )}
+                      {tempCountryDateFrom && tempCountryDateTo && (
+                        <Button 
+                          onClick={applyCustomDates}
+                          className="w-full"
+                        >
+                          Применить даты
+                        </Button>
                       )}
                     </div>
                   </PopoverContent>
