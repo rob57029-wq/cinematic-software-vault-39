@@ -6,9 +6,14 @@ import { Badge } from "@/components/ui/badge";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, PieChart, Pie, Cell, ResponsiveContainer } from "recharts";
+import { Calendar } from "@/components/ui/calendar";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Button } from "@/components/ui/button";
+import { CalendarIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useConfig } from "@/contexts/ConfigContext";
 import { formatInTimeZone } from "date-fns-tz";
+import { format } from "date-fns";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -51,6 +56,11 @@ const Stats = () => {
   const [loading, setLoading] = useState(true);
   const [onlineUsers, setOnlineUsers] = useState(0);
   const [userTimezone] = useState(() => Intl.DateTimeFormat().resolvedOptions().timeZone);
+  
+  // Country chart filters
+  const [countryPeriod, setCountryPeriod] = useState<'hour' | 'day' | 'week' | 'custom'>('day');
+  const [countryDateFrom, setCountryDateFrom] = useState<Date | undefined>();
+  const [countryDateTo, setCountryDateTo] = useState<Date | undefined>();
 
   const fetchSoftwareNames = async () => {
     try {
@@ -94,13 +104,24 @@ const Stats = () => {
 
       setTimelineData(timelineWithTimezone);
 
-      // Fetch country data
+      // Fetch country data based on country period filter
+      let countryPeriodHours = 24;
+      if (countryPeriod === 'hour') {
+        countryPeriodHours = 1;
+      } else if (countryPeriod === 'week') {
+        countryPeriodHours = 168;
+      } else if (countryPeriod === 'custom' && countryDateFrom && countryDateTo) {
+        countryPeriodHours = Math.ceil((countryDateTo.getTime() - countryDateFrom.getTime()) / (1000 * 60 * 60));
+      }
+
       const { data: countries } = await supabase.rpc('get_download_stats_by_country', {
-        period_hours: 24,
+        period_hours: countryPeriodHours,
         software_names: selectedSoftware.length > 0 ? selectedSoftware : null
       });
 
-      setCountryData(countries || []);
+      // Filter out Unknown countries
+      const filteredCountries = (countries || []).filter(country => country.country !== 'Unknown');
+      setCountryData(filteredCountries);
     } catch (error) {
       console.error('Error fetching stats:', error);
     } finally {
@@ -116,7 +137,12 @@ const Stats = () => {
         .order('downloaded_at', { ascending: false })
         .limit(100);
 
-      setLiveLogs(data || []);
+      // Filter out Unknown countries in live logs
+      const filteredLogs = (data || []).map(log => ({
+        ...log,
+        country: log.country === 'Unknown' ? 'Hidden' : log.country
+      }));
+      setLiveLogs(filteredLogs);
     } catch (error) {
       console.error('Error fetching logs:', error);
     }
@@ -152,8 +178,8 @@ const Stats = () => {
       )
       .subscribe();
 
-    // Set up presence tracking for online users
-    const presenceChannel = supabase.channel('online-users')
+    // Set up presence tracking for online users (track main page visitors)
+    const presenceChannel = supabase.channel('main-page-users')
       .on('presence', { event: 'sync' }, () => {
         const state = presenceChannel.presenceState();
         setOnlineUsers(Object.keys(state).length);
@@ -164,14 +190,7 @@ const Stats = () => {
       .on('presence', { event: 'leave' }, ({ key, leftPresences }) => {
         setOnlineUsers(prev => Math.max(0, prev - leftPresences.length));
       })
-      .subscribe(async (status) => {
-        if (status === 'SUBSCRIBED') {
-          await presenceChannel.track({
-            user_id: Math.random().toString(36).substring(7),
-            online_at: new Date().toISOString(),
-          });
-        }
-      });
+      .subscribe();
 
     return () => {
       clearInterval(interval);
@@ -182,7 +201,13 @@ const Stats = () => {
 
   useEffect(() => {
     fetchStats();
-  }, [selectedSoftware, selectedPeriod]);
+  }, [selectedSoftware, selectedPeriod, countryPeriod, countryDateFrom, countryDateTo]);
+
+  const setCountryQuickPeriod = (period: 'hour' | 'day' | 'week') => {
+    setCountryPeriod(period);
+    setCountryDateFrom(undefined);
+    setCountryDateTo(undefined);
+  };
 
   const renderStatsTable = (stats: DownloadStat[], period: string) => (
     <Card>
@@ -324,29 +349,145 @@ const Stats = () => {
           <Card>
             <CardHeader>
               <CardTitle>Скачивания по странам</CardTitle>
+              <div className="flex flex-wrap gap-2 mt-4">
+                <Button
+                  variant={countryPeriod === 'hour' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCountryQuickPeriod('hour')}
+                >
+                  Последний час
+                </Button>
+                <Button
+                  variant={countryPeriod === 'day' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCountryQuickPeriod('day')}
+                >
+                  Последние 24 часа
+                </Button>
+                <Button
+                  variant={countryPeriod === 'week' ? 'default' : 'outline'}
+                  size="sm"
+                  onClick={() => setCountryQuickPeriod('week')}
+                >
+                  Последняя неделя
+                </Button>
+                <Popover>
+                  <PopoverTrigger asChild>
+                    <Button
+                      variant={countryPeriod === 'custom' ? 'default' : 'outline'}
+                      size="sm"
+                      className="justify-start text-left font-normal"
+                    >
+                      <CalendarIcon className="mr-2 h-4 w-4" />
+                      {countryDateFrom && countryDateTo ? (
+                        `${format(countryDateFrom, "dd.MM.yyyy")} - ${format(countryDateTo, "dd.MM.yyyy")}`
+                      ) : (
+                        "Выбрать даты"
+                      )}
+                    </Button>
+                  </PopoverTrigger>
+                  <PopoverContent className="w-auto p-0" align="start">
+                    <div className="p-4 space-y-4">
+                      <div>
+                        <label className="text-sm font-medium">От:</label>
+                        <Calendar
+                          mode="single"
+                          selected={countryDateFrom}
+                          onSelect={(date) => {
+                            setCountryDateFrom(date);
+                            if (date) setCountryPeriod('custom');
+                          }}
+                          disabled={(date) => date > new Date()}
+                        />
+                      </div>
+                      {countryDateFrom && (
+                        <div>
+                          <label className="text-sm font-medium">До:</label>
+                          <Calendar
+                            mode="single"
+                            selected={countryDateTo}
+                            onSelect={(date) => {
+                              setCountryDateTo(date);
+                              if (date) setCountryPeriod('custom');
+                            }}
+                            disabled={(date) => date > new Date() || date < countryDateFrom}
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </PopoverContent>
+                </Popover>
+              </div>
             </CardHeader>
             <CardContent>
-              <ChartContainer config={chartConfig} className="h-[300px]">
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={countryData}
-                      cx="50%"
-                      cy="50%"
-                      labelLine={false}
-                      label={({ country, percent }) => `${country} ${(percent * 100).toFixed(0)}%`}
-                      outerRadius={80}
-                      fill="#8884d8"
-                      dataKey="download_count"
-                    >
-                      {countryData.map((_, index) => (
-                        <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
-                      ))}
-                    </Pie>
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                  </PieChart>
-                </ResponsiveContainer>
-              </ChartContainer>
+              <div className="flex gap-6">
+                <div className="flex-1">
+                  <ChartContainer config={chartConfig} className="h-[400px]">
+                    <ResponsiveContainer width="100%" height="100%">
+                      <PieChart>
+                        <Pie
+                          data={countryData}
+                          cx="50%"
+                          cy="50%"
+                          labelLine={false}
+                          label={({ country, percent, download_count }) => 
+                            countryData.length <= 8 ? `${country} ${(percent * 100).toFixed(0)}% (${download_count})` : ''
+                          }
+                          outerRadius={countryData.length > 8 ? 120 : 100}
+                          fill="#8884d8"
+                          dataKey="download_count"
+                        >
+                          {countryData.map((_, index) => (
+                            <Cell key={`cell-${index}`} fill={CHART_COLORS[index % CHART_COLORS.length]} />
+                          ))}
+                        </Pie>
+                        <ChartTooltip 
+                          content={({ active, payload }) => {
+                            if (active && payload && payload.length) {
+                              const data = payload[0].payload;
+                              return (
+                                <div className="bg-background border rounded-lg p-3 shadow-lg">
+                                  <p className="font-medium">{data.country}</p>
+                                  <p className="text-sm text-muted-foreground">
+                                    Скачивания: {data.download_count}
+                                  </p>
+                                </div>
+                              );
+                            }
+                            return null;
+                          }}
+                        />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  </ChartContainer>
+                </div>
+                
+                {/* Country Statistics Table */}
+                <div className="w-80">
+                  <h4 className="font-semibold mb-4">Статистика по странам</h4>
+                  <div className="space-y-2 max-h-[400px] overflow-y-auto">
+                    {countryData.map((country, index) => {
+                      const total = countryData.reduce((sum, c) => sum + c.download_count, 0);
+                      const percentage = total > 0 ? (country.download_count / total * 100).toFixed(1) : '0';
+                      return (
+                        <div key={country.country} className="flex items-center justify-between p-2 bg-muted/50 rounded-lg">
+                          <div className="flex items-center gap-2">
+                            <div 
+                              className="w-3 h-3 rounded-full" 
+                              style={{ backgroundColor: CHART_COLORS[index % CHART_COLORS.length] }}
+                            />
+                            <span className="text-sm font-medium">{country.country}</span>
+                          </div>
+                          <div className="text-right">
+                            <div className="text-sm font-medium">{country.download_count}</div>
+                            <div className="text-xs text-muted-foreground">{percentage}%</div>
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </div>
@@ -361,7 +502,7 @@ const Stats = () => {
               <div className="bg-black rounded-lg p-4 h-64 overflow-y-auto font-mono text-sm">
                 {liveLogs.slice(0, 50).map((log) => (
                   <div key={log.id} className="text-green-400 mb-1">
-                    [{formatInTimeZone(new Date(log.downloaded_at), userTimezone, 'yyyy-MM-dd HH:mm:ss')}] {log.software_name}:{log.country || 'Unknown'}:{log.user_ip || 'Hidden'}
+                    [{formatInTimeZone(new Date(log.downloaded_at), userTimezone, 'yyyy-MM-dd HH:mm:ss')}] {log.software_name}:{log.country || 'Hidden'}:{log.user_ip || 'Hidden'}
                   </div>
                 ))}
                 {liveLogs.length === 0 && (
