@@ -36,6 +36,7 @@ const SoftwareCard: React.FC<SoftwareCardProps> = ({ software, onClick, classNam
   const getSoftwareIcon = (): LucideIcon => {
     const name = software.name.toLowerCase();
     
+    // Software icons
     if (name.includes('photoshop')) return Image;
     if (name.includes('spotify')) return Music;
     if (name.includes('internet download')) return Download;
@@ -73,6 +74,88 @@ const SoftwareCard: React.FC<SoftwareCardProps> = ({ software, onClick, classNam
     if (name.includes('avs')) return Edit;
     if (name.includes('nitro')) return FileText;
     if (name.includes('systemcare')) return Settings;
+    
+    // Game cheat icons
+    if (name.includes('gta') || name.includes('kiddions')) return Play;
+    if (name.includes('krnl') || name.includes('executor') || name.includes('roblox')) return Bot;
+    if (name.includes('among us')) return Shield;
+    if (name.includes('forza') || name.includes('horizon')) return Zap;
+    if (name.includes('minecraft')) return Box;
+    if (name.includes('ea fc') || name.includes('fifa')) return Play;
+    if (name.includes('cod') || name.includes('warzone') || name.includes('black ops')) return Zap;
+    if (name.includes('8 ball') || name.includes('pool')) return Play;
+    if (name.includes('cs2') || name.includes('counter-strike')) return Shield;
+    if (name.includes('rdr') || name.includes('red dead')) return Play;
+    if (name.includes('valorant')) return Zap;
+    if (name.includes('lol') || name.includes('league of legends')) return Play;
+    if (name.includes('albion')) return Shield;
+    if (name.includes('rainbow six')) return Zap;
+    if (name.includes('peak') || name.includes('trainer')) return Settings;
+    if (name.includes('fortnite')) return Zap;
+    if (name.includes('apex')) return Shield;
+    if (name.includes('pubg')) return Zap;
+    if (name.includes('tarkov')) return Shield;
+    if (name.includes('destiny')) return Zap;
+    if (name.includes('palworld')) return Play;
+    if (name.includes('rust')) return Shield;
+    if (name.includes('ark')) return Play;
+    if (name.includes('finals')) return Zap;
+    if (name.includes('dota')) return Play;
+    if (name.includes('overwatch')) return Zap;
+    if (name.includes('helldivers')) return Shield;
+    if (name.includes('stalcraft')) return Zap;
+    if (name.includes('enshrouded')) return Play;
+    if (name.includes('squad')) return Shield;
+    if (name.includes('hunt')) return Zap;
+    if (name.includes('ghost of tsushima')) return Play;
+    if (name.includes('horizon forbidden')) return Play;
+    if (name.includes('spider-man')) return Play;
+    if (name.includes('cyberpunk')) return Zap;
+    if (name.includes('elden ring')) return Play;
+    if (name.includes('baldur')) return Play;
+    if (name.includes('starfield')) return Zap;
+    if (name.includes('dayz')) return Shield;
+    if (name.includes('sea of thieves')) return Play;
+    if (name.includes('nba')) return Play;
+    if (name.includes('monster hunter')) return Zap;
+    if (name.includes('silent hill')) return Play;
+    if (name.includes('alan wake')) return Play;
+    if (name.includes('lies of p')) return Play;
+    if (name.includes('assassin')) return Zap;
+    if (name.includes('god of war')) return Play;
+    if (name.includes('hogwarts')) return Play;
+    if (name.includes('mortal kombat')) return Zap;
+    if (name.includes('tekken')) return Play;
+    if (name.includes('street fighter')) return Zap;
+    if (name.includes('gran turismo')) return Play;
+    if (name.includes('flight simulator')) return Play;
+    if (name.includes('farming simulator')) return Play;
+    if (name.includes('euro truck')) return Play;
+    if (name.includes('kerbal')) return Zap;
+    if (name.includes('cities')) return Settings;
+    if (name.includes('total war')) return Shield;
+    if (name.includes('company of heroes')) return Zap;
+    if (name.includes('crusader kings')) return Play;
+    if (name.includes('hearts of iron')) return Shield;
+    if (name.includes('stellaris')) return Zap;
+    if (name.includes('civilization')) return Play;
+    if (name.includes('age of empires')) return Shield;
+    if (name.includes('xcom')) return Zap;
+    if (name.includes('warhammer')) return Play;
+    if (name.includes('path of exile')) return Shield;
+    if (name.includes('diablo')) return Zap;
+    if (name.includes('world of warcraft')) return Bot;
+    if (name.includes('lost ark')) return Bot;
+    if (name.includes('black desert')) return Bot;
+    if (name.includes('new world')) return Bot;
+    if (name.includes('elder scrolls')) return Play;
+    if (name.includes('fallout')) return Zap;
+    if (name.includes('state of decay')) return Shield;
+    if (name.includes('metro')) return Zap;
+    if (name.includes('stalker')) return Play;
+    if (name.includes('control')) return Zap;
+    if (name.includes('payday')) return Shield;
+    if (name.includes('witcher')) return Play;
     
     // Default icon for any other software
     return Box;

@@ -370,47 +370,311 @@ const gameData: SoftwareItem[] = [
   }
 ];
 
-// Additional game data for remaining entries
+// Additional remaining game data for all 80+ cheats/mods
 const remainingGameData: SoftwareItem[] = [
   {
-    id: "roblox-velocity",
-    name: "Roblox Velocity Executor",
-    icon: "https://i.imgur.com/W9X2kL4.png",
-    version: "v2.1.7",
+    id: "roblox-blade-ball-script",
+    name: "Roblox Blade Ball Script",
+    icon: "https://i.imgur.com/B7X3mK9.png",
+    version: "v2.4.8",
+    releaseDate: "August 2025",
+    rating: 5,
+    description: "Ultimate Blade Ball script with auto-parry, speed boost, and advanced player enhancements.",
+    installSteps: [
+      "Download and extract script files.",
+      "Launch Roblox and join Blade Ball.",
+      "Execute the script using your executor.",
+      "Configure auto-parry settings."
+    ],
+    features: [
+      "Perfect auto-parry system",
+      "Speed and jump boosts",
+      "Ball prediction algorithm",
+      "Anti-kick protection",
+      "Statistics display",
+      "Customizable settings"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Roblox + Executor",
+      "3GB RAM minimum",
+      "Stable internet",
+      "Blade Ball game access"
+    ]
+  },
+  {
+    id: "roblox-dead-rails-script",
+    name: "Roblox Dead Rails Script",
+    icon: "https://i.imgur.com/D8R4nL3.png",
+    version: "v1.7.2",
     releaseDate: "August 2025",
     rating: 4,
-    description: "High-performance Roblox executor with advanced script support and anti-detection features.",
-    installSteps: ["Extract files", "Run as admin", "Inject into Roblox", "Execute scripts"],
-    features: ["Level 7+ execution", "Built-in script hub", "Auto-update system", "Anti-detection", "Custom UI", "Fast injection"],
-    systemRequirements: ["Windows 10/11", "Roblox installed", "4GB RAM", ".NET Framework", "Admin privileges"]
+    description: "Comprehensive Dead Rails automation script with auto-farm, ESP, and combat enhancements.",
+    installSteps: [
+      "Extract script package with password.",
+      "Join Dead Rails in Roblox.",
+      "Execute using your preferred executor.",
+      "Enable desired automation features."
+    ],
+    features: [
+      "Auto-farming system",
+      "Player and zombie ESP",
+      "Auto-combat features",
+      "Resource collection automation",
+      "Anti-detection measures",
+      "Customizable GUI"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Roblox + Script Executor",
+      "3GB RAM minimum",
+      "Internet connection",
+      "Dead Rails game access"
+    ]
   },
   {
-    id: "roblox-fisch-script",
-    name: "Roblox Fisch Script",
-    icon: "https://i.imgur.com/P4R6mN8.png",
-    version: "v3.2.1",
+    id: "roblox-arise-crossover-script",
+    name: "Roblox Arise Crossover Script",
+    icon: "https://i.imgur.com/A9C5xT7.png",
+    version: "v2.1.5",
     releaseDate: "August 2025",
-    rating: 5,
-    description: "Advanced fishing automation script for Fisch with auto-catch, sell, and progression features.",
-    installSteps: ["Download script", "Join Fisch game", "Execute script", "Enable auto-fishing"],
-    features: ["Auto-fishing system", "Auto-sell caught fish", "Best spot finder", "Anti-AFK bypass", "Statistics tracking", "Profit optimization"],
-    systemRequirements: ["Windows 10/11", "Roblox + Script Executor", "2GB RAM", "Internet connection", "Fisch game access"]
+    rating: 4,
+    description: "Advanced Arise Crossover script with auto-quest, skill farming, and progression automation.",
+    installSteps: [
+      "Download script files and extract.",
+      "Launch Roblox Arise Crossover.",
+      "Execute script in your executor.",
+      "Configure auto-quest settings."
+    ],
+    features: [
+      "Auto-quest completion",
+      "Skill farming automation",
+      "Level progression boost",
+      "Item collection system",
+      "Anti-ban protection",
+      "Real-time statistics"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Roblox + Executor",
+      "4GB RAM minimum",
+      "Stable internet",
+      "Arise Crossover access"
+    ]
   },
   {
-    id: "valorant-hack",
-    name: "Valorant Hack",
-    icon: "https://i.imgur.com/R7K2mP9.png",
-    version: "v2025.8",
+    id: "roblox-swift-executor",
+    name: "Roblox Swift Executor",
+    icon: "https://i.imgur.com/S6W8mK2.png",
+    version: "v4.1.3",
     releaseDate: "August 2025",
     rating: 5,
-    description: "Advanced Valorant cheat with aimbot, ESP, triggerbot, and anti-cheat bypass systems.",
-    installSteps: ["Extract cheat files", "Disable antivirus", "Run loader as admin", "Inject after game launch"],
-    features: ["Advanced aimbot system", "Player ESP and wallhack", "Triggerbot automation", "Recoil control", "Radar hack", "Stream-proof features"],
-    systemRequirements: ["Windows 10/11", "Valorant installed", "8GB RAM", "Admin access", "Secure boot disabled"]
+    description: "Ultra-fast Roblox executor with premium features and advanced script support.",
+    installSteps: [
+      "Extract Swift Executor files.",
+      "Disable Windows Defender temporarily.",
+      "Run Swift as administrator.",
+      "Inject and execute your scripts."
+    ],
+    features: [
+      "Lightning-fast injection",
+      "Level 8+ script execution",
+      "Premium script library",
+      "Advanced anti-detection",
+      "Custom UI themes",
+      "Auto-update system"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Roblox installed",
+      "4GB RAM minimum",
+      ".NET Framework 4.8",
+      "Administrative privileges"
+    ]
+  },
+  {
+    id: "roblox-jailbreak-script",
+    name: "Roblox Jailbreak Script",
+    icon: "https://i.imgur.com/J7B9mN4.png",
+    version: "v3.8.1",
+    releaseDate: "August 2025",
+    rating: 5,
+    description: "Ultimate Jailbreak script with auto-rob, ESP, teleportation, and money farming features.",
+    installSteps: [
+      "Download Jailbreak script package.",
+      "Join Jailbreak in Roblox.",
+      "Execute script using your executor.",
+      "Enable auto-rob and other features."
+    ],
+    features: [
+      "Auto-rob all locations",
+      "Player and vehicle ESP",
+      "Teleportation system",
+      "Money farming automation",
+      "Police bypass features",
+      "Anti-arrest protection"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Roblox + Script Executor",
+      "3GB RAM minimum",
+      "Internet connection",
+      "Jailbreak game access"
+    ]
+  },
+  {
+    id: "roblox-volcano-executor",
+    name: "Roblox Volcano Executor",
+    icon: "https://i.imgur.com/V8L7mP6.png",
+    version: "v2.9.4",
+    releaseDate: "August 2025",
+    rating: 4,
+    description: "Powerful Roblox executor with advanced features and comprehensive script support.",
+    installSteps: [
+      "Extract Volcano Executor files.",
+      "Run as administrator.",
+      "Inject into Roblox process.",
+      "Load and execute your scripts."
+    ],
+    features: [
+      "Level 7 script execution",
+      "Built-in script hub",
+      "Custom DLL injection",
+      "Anti-crash protection",
+      "Multi-instance support",
+      "Regular updates"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Roblox installed",
+      "4GB RAM minimum",
+      "Visual C++ Redistributable",
+      "Administrative access"
+    ]
+  },
+  {
+    id: "lol-skin-changer",
+    name: "LoL Skin Changer",
+    icon: "https://i.imgur.com/L9S5kR8.png",
+    version: "v14.17.2",
+    releaseDate: "August 2025",
+    rating: 4,
+    description: "Advanced League of Legends skin changer with all skins, chromas, and ward skins available.",
+    installSteps: [
+      "Extract skin changer files with password.",
+      "Close League of Legends completely.",
+      "Run skin changer as administrator.",
+      "Launch LoL and select desired skins."
+    ],
+    features: [
+      "All champion skins unlocked",
+      "Chroma variations available",
+      "Ward and emote skins",
+      "Real-time skin switching",
+      "Config save/load system",
+      "Riot-safe implementation"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "League of Legends installed",
+      "Riot Games client",
+      "4GB RAM minimum",
+      "Administrative privileges"
+    ]
+  },
+  {
+    id: "valorant-skin-changer",
+    name: "Valorant Skin Changer",
+    icon: "https://i.imgur.com/V9K3mL7.png",
+    version: "v8.11.1",
+    releaseDate: "August 2025",
+    rating: 5,
+    description: "Complete Valorant skin changer with all weapon skins, buddies, and player cards.",
+    installSteps: [
+      "Download and extract with password.",
+      "Close Valorant and Riot Client.",
+      "Run skin changer as administrator.",
+      "Launch Valorant and enjoy skins."
+    ],
+    features: [
+      "All weapon skin collection",
+      "Knife and melee skins",
+      "Gun buddy customization",
+      "Player card unlocks",
+      "Spray and title access",
+      "Vanguard-safe operation"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Valorant installed",
+      "Riot Vanguard compatible",
+      "6GB RAM minimum",
+      "Administrative access"
+    ]
+  },
+  {
+    id: "albion-online-hack",
+    name: "Albion Online Hack",
+    icon: "https://i.imgur.com/A8B7mK4.png",
+    version: "v28.3.1",
+    releaseDate: "August 2025",
+    rating: 4,
+    description: "Comprehensive Albion Online hack with gathering bot, PvP enhancements, and economy tools.",
+    installSteps: [
+      "Extract hack files with password.",
+      "Launch Albion Online first.",
+      "Inject hack as administrator.",
+      "Configure desired features."
+    ],
+    features: [
+      "Auto-gathering bot system",
+      "PvP combat enhancements",
+      "Economy tracking tools",
+      "Dungeon farming automation",
+      "Player tracking radar",
+      "Anti-detection measures"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Albion Online installed",
+      "8GB RAM minimum",
+      "Stable internet connection",
+      "Administrative privileges"
+    ]
+  },
+  {
+    id: "rainbow-six-siege-cheats",
+    name: "Rainbow Six Siege Cheats",
+    icon: "https://i.imgur.com/R6S9mN2.png",
+    version: "v9.4.2",
+    releaseDate: "August 2025",
+    rating: 5,
+    description: "Advanced R6S cheat with wallhack, aimbot, recoil control, and BattlEye bypass.",
+    installSteps: [
+      "Extract cheat package with password.",
+      "Disable all antivirus software.",
+      "Run loader as administrator.",
+      "Inject after game launch."
+    ],
+    features: [
+      "Player wallhack and ESP",
+      "Advanced aimbot system",
+      "Recoil control macro",
+      "Gadget ESP display",
+      "No spread/no recoil",
+      "BattlEye bypass technology"
+    ],
+    systemRequirements: [
+      "Windows 10/11",
+      "Rainbow Six Siege",
+      "8GB RAM minimum",
+      "Uplay/Steam client",
+      "Administrative access"
+    ]
   }
 ];
 
-// Complete game data array
+// Complete game data array with all cheats and mods
 const allGameData = [...gameData, ...remainingGameData];
 
 const Games = () => {
