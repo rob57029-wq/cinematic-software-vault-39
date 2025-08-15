@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { ConfigProvider } from "./contexts/ConfigContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import Index from "./pages/Index";
+import Games from "./pages/Games";
 import Stats from "./pages/Stats";
 import NotFound from "./pages/NotFound";
 import ParticleBackground from "./components/ParticleBackground";
@@ -24,6 +25,7 @@ const App = () => (
           <BrowserRouter>
             <Routes>
               <Route path="/" element={<Index />} />
+              <Route path="/games" element={<Games />} />
               <Route path="/stats" element={<Stats />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
