@@ -1,6 +1,5 @@
 
 import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import LanguageSelector from "./LanguageSelector";
 import { useConfig } from "@/contexts/ConfigContext";
@@ -11,7 +10,6 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const { config } = useConfig();
   const { t } = useLanguage();
-  const location = useLocation();
   
   useEffect(() => {
     const handleScroll = () => {
@@ -50,55 +48,20 @@ const Navbar = () => {
         
         {/* Desktop Navigation */}
         <nav className="hidden md:flex space-x-8">
-          <Link 
-            to="/"
-            className={cn(
-              "text-white/80 hover:text-white transition-colors text-sm font-light",
-              location.pathname === "/" && "text-white"
-            )}
-          >
-            {t("home")}
-          </Link>
-          <Link 
-            to="/games"
-            className={cn(
-              "text-white/80 hover:text-white transition-colors text-sm font-light",
-              location.pathname === "/games" && "text-white"
-            )}
-          >
-            Game Cheats
-          </Link>
-          {location.pathname === "/" && (
-            <>
-              <button 
-                onClick={() => scrollTo("software")}
-                className="text-white/80 hover:text-white transition-colors text-sm font-light"
-              >
-                {t("software")}
-              </button>
-              <button 
-                onClick={() => scrollTo("reviews")}
-                className="text-white/80 hover:text-white transition-colors text-sm font-light"
-              >
-                {t("reviews")}
-              </button>
-              <button 
-                onClick={() => scrollTo("how-to-install")}
-                className="text-white/80 hover:text-white transition-colors text-sm font-light"
-              >
-                {t("howToInstall")}
-              </button>
-            </>
-          )}
-          <Link 
-            to="/stats"
-            className={cn(
-              "text-white/80 hover:text-white transition-colors text-sm font-light",
-              location.pathname === "/stats" && "text-white"
-            )}
-          >
-            Stats
-          </Link>
+          {[
+            { id: "home", label: t("home") },
+            { id: "software", label: t("software") },
+            { id: "reviews", label: t("reviews") },
+            { id: "how-to-install", label: t("howToInstall") }
+          ].map((item) => (
+            <button 
+              key={item.id}
+              onClick={() => scrollTo(item.id)}
+              className="text-white/80 hover:text-white transition-colors text-sm font-light"
+            >
+              {item.label}
+            </button>
+          ))}
         </nav>
         
         {/* Language Selector */}
@@ -146,58 +109,20 @@ const Navbar = () => {
               </svg>
             </button>
           </div>
-          <Link 
-            to="/"
-            onClick={() => setIsMenuOpen(false)}
-            className={cn(
-              "text-left text-white/80 hover:text-white p-2 transition-colors text-lg font-light",
-              location.pathname === "/" && "text-white"
-            )}
-          >
-            {t("home")}
-          </Link>
-          <Link 
-            to="/games"
-            onClick={() => setIsMenuOpen(false)}
-            className={cn(
-              "text-left text-white/80 hover:text-white p-2 transition-colors text-lg font-light",
-              location.pathname === "/games" && "text-white"
-            )}
-          >
-            Game Cheats
-          </Link>
-          {location.pathname === "/" && (
-            <>
-              <button 
-                onClick={() => scrollTo("software")}
-                className="text-left text-white/80 hover:text-white p-2 transition-colors text-lg font-light"
-              >
-                {t("software")}
-              </button>
-              <button 
-                onClick={() => scrollTo("reviews")}
-                className="text-left text-white/80 hover:text-white p-2 transition-colors text-lg font-light"
-              >
-                {t("reviews")}
-              </button>
-              <button 
-                onClick={() => scrollTo("how-to-install")}
-                className="text-left text-white/80 hover:text-white p-2 transition-colors text-lg font-light"
-              >
-                {t("howToInstall")}
-              </button>
-            </>
-          )}
-          <Link 
-            to="/stats"
-            onClick={() => setIsMenuOpen(false)}
-            className={cn(
-              "text-left text-white/80 hover:text-white p-2 transition-colors text-lg font-light",
-              location.pathname === "/stats" && "text-white"
-            )}
-          >
-            Stats
-          </Link>
+          {[
+            { id: "home", label: t("home") },
+            { id: "software", label: t("software") },
+            { id: "reviews", label: t("reviews") },
+            { id: "how-to-install", label: t("howToInstall") }
+          ].map((item) => (
+            <button 
+              key={item.id}
+              onClick={() => scrollTo(item.id)}
+              className="text-left text-white/80 hover:text-white p-2 transition-colors text-lg font-light"
+            >
+              {item.label}
+            </button>
+          ))}
           
           <div className="mt-4">
             <LanguageSelector />
